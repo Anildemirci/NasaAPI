@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 struct NasaAPI: Codable {
     let photos: [Photo]
 }

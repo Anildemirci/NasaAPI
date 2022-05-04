@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CustomTabBarView: View {
     
-    @State var selected = ""
+    @State private var selected = ""
     
     var body: some View {
         VStack {
@@ -36,7 +36,8 @@ struct CustomTabBarView_Previews: PreviewProvider {
 
 struct TabButton : View {
     
-    var title : String
+    fileprivate var title : String
+    
     var body: some View {
         NavigationLink(destination: RoverView(selectedTab: title)) {
             VStack(spacing:5){
@@ -55,4 +56,4 @@ struct TabButton : View {
     }
 }
 
-var tabs = ["Curiosity","Opportunity","Spirit"]
+private var tabs = ["Curiosity","Opportunity","Spirit"]

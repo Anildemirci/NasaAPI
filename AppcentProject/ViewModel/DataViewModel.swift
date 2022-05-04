@@ -8,16 +8,18 @@
 import Foundation
 import Alamofire
 import SwiftyJSON
+import Combine
 
 class DataViewModel : ObservableObject {
+    
     @Published var photoList = [Photo]()
     @Published var cameraList = [Camera]()
     @Published var roverList = [Rover]()
     @Published var collectionList = [String]()
     
-    func getData(url: String) {
+    internal func getData(url: String) {
         
-        AF.request(url).responseData { (responseData) in
+            AF.request(url).responseData { (responseData) in
             
             guard let data = responseData.data else { return }
             do {
@@ -29,7 +31,6 @@ class DataViewModel : ObservableObject {
                         self.cameraList.append(i.camera)
                         self.roverList.append(i.rover)
                         //self.collectionList.append(i.camera.fullName)
-                        
                     }
                 }
             } catch {
@@ -37,4 +38,5 @@ class DataViewModel : ObservableObject {
             }
         }
     }
+
 }
