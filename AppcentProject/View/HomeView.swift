@@ -66,6 +66,7 @@ struct GridView: View {
     @State private var status=""
     @State private var landingDate=""
     @State private var launchDate=""
+    @State var count=1
     
     let columns = [
         GridItem(.flexible()),
@@ -74,28 +75,58 @@ struct GridView: View {
     
     var body: some View {
         VStack {
-            LazyVGrid(columns: columns) {
-                ForEach(datas.allPhotoList){i in
-                            VStack{
-                                AnimatedImage(url: URL(string: i.imgSrc))
-                                    .resizable()
-                                    .frame(width: UIScreen.main.bounds.width * 0.45, height: UIScreen.main.bounds.height * 0.3)
-                                    .cornerRadius(20)
-                                    .onTapGesture {
-                                        image=i.imgSrc
-                                        date=i.earthDate
-                                        roverName=i.rover.name
-                                        camera=i.camera.fullName
-                                        status=i.rover.status
-                                        landingDate=i.rover.landingDate
-                                        launchDate=i.rover.launchDate
-                                        showingPopover.toggle()
-                                    }
+            if datas.allPhotoList.isEmpty {
+                ProgressView()
+                    .padding(.top,30)
+            } else {
+                LazyVGrid(columns: columns) {
+                    ForEach(datas.allPhotoList){i in
+                                VStack{
+                                    AnimatedImage(url: URL(string: i.imgSrc))
+                                        .resizable()
+                                        .frame(width: UIScreen.main.bounds.width * 0.45, height: UIScreen.main.bounds.height * 0.3)
+                                        .cornerRadius(20)
+                                        .onTapGesture {
+                                            image=i.imgSrc
+                                            date=i.earthDate
+                                            roverName=i.rover.name
+                                            camera=i.camera.fullName
+                                            status=i.rover.status
+                                            landingDate=i.rover.landingDate
+                                            launchDate=i.rover.launchDate
+                                            showingPopover.toggle()
+                                        }
+                                }
+                    }
+                    if datas.page == datas.allPhotoList.count {
+                        ProgressView()
+                            .padding(.vertical)
+                            .onAppear(perform: {
+                                count=count+1
+                                datas.fetchData(page: count)
+                            })
+                    } else {
+                        GeometryReader{reader -> Color in
+                            let minY=reader.frame(in: .global).minY
+                            let height = UIScreen.main.bounds.height / 1.3
+                            
+                            if !datas.allPhotoList.isEmpty && minY < height {
+                                DispatchQueue.main.async {
+                                    datas.page = datas.allPhotoList.count
+                                }
                             }
+                            return Color.clear
+                        }
+                        .frame(width: 20, height: 20)
+                    }
                 }
             }
         }.onAppear{
-            datas.allPhotos()
+            if datas.allPhotoList.isEmpty {
+                datas.fetchData(page: 1)
+            } else {
+                
+            }
         }
         .popover(isPresented: $showingPopover) { () -> PhotoInfoView in
             PhotoInfoView(image: $image, date: $date, roverName: $roverName, camera: $camera, status: $status, landingDate: $landingDate, launchDate: $launchDate)
@@ -118,11 +149,11 @@ struct RowView: View {
     
     var body: some View {
         VStack {
-            if datas.pagiList.isEmpty{
+            if datas.allPhotoList.isEmpty{
                 ProgressView()
                     .padding(.top,30)
             } else {
-                ForEach(datas.pagiList){i in
+                ForEach(datas.allPhotoList){i in
                     VStack{
                         AnimatedImage(url: URL(string: i.imgSrc))
                             .resizable()
@@ -141,7 +172,7 @@ struct RowView: View {
                     }
                 }
                 
-                if datas.page == datas.pagiList.count {
+                if datas.page == datas.allPhotoList.count {
                     ProgressView()
                         .padding(.vertical)
                         .onAppear(perform: {
@@ -153,9 +184,9 @@ struct RowView: View {
                         let minY=reader.frame(in: .global).minY
                         let height = UIScreen.main.bounds.height / 1.3
                         
-                        if !datas.pagiList.isEmpty && minY < height {
+                        if !datas.allPhotoList.isEmpty && minY < height {
                             DispatchQueue.main.async {
-                                datas.page = datas.pagiList.count
+                                datas.page = datas.allPhotoList.count
                             }
                         }
                         return Color.clear
@@ -164,7 +195,7 @@ struct RowView: View {
                 }
             }
         }.onAppear{
-            if datas.pagiList.isEmpty{
+            if datas.allPhotoList.isEmpty{
                 datas.fetchData(page: 1)
             } else {
                 

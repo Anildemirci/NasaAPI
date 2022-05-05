@@ -15,7 +15,6 @@ class DataViewModel : ObservableObject {
     
     @Published var photoList = [Photo]()
     @Published var allPhotoList = [Photo]()
-    @Published var pagiList=[Photo]()
     @Published var page = 1
     
     //Alamofire
@@ -39,35 +38,6 @@ class DataViewModel : ObservableObject {
         }
     }
     
-    func allPhotos() {
-        
-        for name in rovers {
-            
-            AF.request("https://api.nasa.gov/mars-photos/api/v1/rovers/\(name)/photos?sol=1000&api_key=8EgsUMXA8B68dbAIaevGEfocEWOiwEf0pSW38hEe&page=1").responseData { (responseData) in
-            
-            guard let data = responseData.data else { return }
-            do {
-                let photos = try JSONDecoder().decode(NasaAPI.self, from: data)
-                DispatchQueue.main.async {
-                    
-                    for i in photos.photos {
-                        self.allPhotoList.append(i)
-                    }
-                    let sortedPhotos = self.allPhotoList.sorted {
-                        $0.id < $1.id
-                    }
-                    self.allPhotoList=sortedPhotos
-                }
-            } catch {
-                print("hata2")
-                print(error.localizedDescription)
-            }
-        }
-            
-        }
-    }
-    
-    
     // URLSession
     func fetchData(page: Int){
         
@@ -87,11 +57,11 @@ class DataViewModel : ObservableObject {
                 let characters = try JSONDecoder().decode(NasaAPI.self, from: APIData)
                 DispatchQueue.main.async {
                     
-                    self.pagiList.append(contentsOf: characters.photos)
-                    let sortedPhotos = self.pagiList.sorted {
+                    self.allPhotoList.append(contentsOf: characters.photos)
+                    let sortedPhotos = self.allPhotoList.sorted {
                         $0.id < $1.id
                     }
-                    self.pagiList=sortedPhotos
+                    self.allPhotoList=sortedPhotos
                 }
             } catch {
                 print(error.localizedDescription)
