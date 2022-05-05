@@ -141,13 +141,12 @@ struct RowView: View {
                     }
                 }
                 
-                if datas.offset == datas.pagiList.count {
+                if datas.page == datas.pagiList.count {
                     ProgressView()
                         .padding(.vertical)
                         .onAppear(perform: {
                             count=count+1
                             datas.fetchData(page: count)
-                            print(count)
                         })
                 } else {
                     GeometryReader{reader -> Color in
@@ -156,7 +155,7 @@ struct RowView: View {
                         
                         if !datas.pagiList.isEmpty && minY < height {
                             DispatchQueue.main.async {
-                                datas.offset = datas.pagiList.count
+                                datas.page = datas.pagiList.count
                             }
                         }
                         return Color.clear

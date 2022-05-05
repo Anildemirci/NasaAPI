@@ -16,7 +16,8 @@ class DataViewModel : ObservableObject {
     @Published var photoList = [Photo]()
     @Published var allPhotoList = [Photo]()
     @Published var pagiList=[Photo]()
-    @Published var offset = 1
+    @Published var page = 1
+    
     //Alamofire
     
     internal func getData(url: String) {
