@@ -16,8 +16,7 @@ class DataViewModel : ObservableObject {
     @Published var photoList = [Photo]()
     @Published var allPhotoList = [Photo]()
     @Published var pagiList=[Photo]()
-    @Published var offset: Int = 0
-    
+    @Published var offset = 1
     //Alamofire
     
     internal func getData(url: String) {
@@ -43,7 +42,7 @@ class DataViewModel : ObservableObject {
         
         for name in rovers {
             
-            AF.request("https://api.nasa.gov/mars-photos/api/v1/rovers/\(name)/photos?sol=1000&api_key=PypebXnYPJ43Gz1ecJwPztuxe8THTFWGMXnp4VnD&page=1").responseData { (responseData) in
+            AF.request("https://api.nasa.gov/mars-photos/api/v1/rovers/\(name)/photos?sol=1000&api_key=8EgsUMXA8B68dbAIaevGEfocEWOiwEf0pSW38hEe&page=1").responseData { (responseData) in
             
             guard let data = responseData.data else { return }
             do {
@@ -60,16 +59,18 @@ class DataViewModel : ObservableObject {
                 }
             } catch {
                 print("hata2")
+                print(error.localizedDescription)
             }
         }
             
         }
     }
     
+    
     // URLSession
-    func fetchData(){
-        let url="https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?&sol=1000&api_key=PypebXnYPJ43Gz1ecJwPztuxe8THTFWGMXnp4VnD&page=\(offset)"
+    func fetchData(page: Int){
         
+        let url="https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?&sol=1000&api_key=8EgsUMXA8B68dbAIaevGEfocEWOiwEf0pSW38hEe&page=\(page)"
         let session=URLSession(configuration: .default)
         session.dataTask(with: URL(string: url)!) { (data, _, error) in
             if let error = error {
@@ -84,14 +85,20 @@ class DataViewModel : ObservableObject {
             do {
                 let characters = try JSONDecoder().decode(NasaAPI.self, from: APIData)
                 DispatchQueue.main.async {
+                    
                     self.pagiList.append(contentsOf: characters.photos)
+                    let sortedPhotos = self.pagiList.sorted {
+                        $0.id < $1.id
+                    }
+                    self.pagiList=sortedPhotos
                 }
             } catch {
                 print(error.localizedDescription)
             }
         }.resume()
     }
-
+    
+    
 }
 
 private var rovers = ["curiosity","opportunity","spirit"]

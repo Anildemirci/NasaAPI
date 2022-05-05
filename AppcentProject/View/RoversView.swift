@@ -72,7 +72,7 @@ struct RoverView: View {
             }
         }
         .onAppear{
-            datas.getData(url: "https://api.nasa.gov/mars-photos/api/v1/rovers/\(selectedTab)/photos?sol=1000&api_key=PypebXnYPJ43Gz1ecJwPztuxe8THTFWGMXnp4VnD&page=1")
+            datas.getData(url: "https://api.nasa.gov/mars-photos/api/v1/rovers/\(selectedTab)/photos?sol=1000&api_key=8EgsUMXA8B68dbAIaevGEfocEWOiwEf0pSW38hEe&page=1")
         }
         .popover(isPresented: $showingPopover) { () -> PhotoInfoView in
             PhotoInfoView(image: $image, date: $date, roverName: $roverName, camera: $camera, status: $status, landingDate: $landingDate, launchDate: $launchDate)

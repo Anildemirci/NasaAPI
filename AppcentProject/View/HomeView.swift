@@ -114,6 +114,7 @@ struct RowView: View {
     @State private var status=""
     @State private var landingDate=""
     @State private var launchDate=""
+    @State var count=1
     
     var body: some View {
         VStack {
@@ -144,8 +145,9 @@ struct RowView: View {
                     ProgressView()
                         .padding(.vertical)
                         .onAppear(perform: {
-                            datas.offset+=1
-                            datas.fetchData()
+                            count=count+1
+                            datas.fetchData(page: count)
+                            print(count)
                         })
                 } else {
                     GeometryReader{reader -> Color in
@@ -164,7 +166,9 @@ struct RowView: View {
             }
         }.onAppear{
             if datas.pagiList.isEmpty{
-                datas.fetchData()
+                datas.fetchData(page: 1)
+            } else {
+                
             }
         }
         .popover(isPresented: $showingPopover) { () -> PhotoInfoView in
@@ -172,6 +176,7 @@ struct RowView: View {
         }
     }
 }
+
 
 
 
