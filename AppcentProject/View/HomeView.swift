@@ -117,32 +117,62 @@ struct RowView: View {
     
     var body: some View {
         VStack {
-            ForEach(datas.allPhotoList){i in
-                VStack{
-                    AnimatedImage(url: URL(string: i.imgSrc))
-                        .resizable()
-                        .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.3)
-                        .cornerRadius(20)
-                        .onTapGesture {
-                            image=i.imgSrc
-                            date=i.earthDate
-                            roverName=i.rover.name
-                            camera=i.camera.fullName
-                            status=i.rover.status
-                            landingDate=i.rover.landingDate
-                            launchDate=i.rover.launchDate
-                            showingPopover.toggle()
+            if datas.pagiList.isEmpty{
+                ProgressView()
+                    .padding(.top,30)
+            } else {
+                ForEach(datas.pagiList){i in
+                    VStack{
+                        AnimatedImage(url: URL(string: i.imgSrc))
+                            .resizable()
+                            .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.3)
+                            .cornerRadius(20)
+                            .onTapGesture {
+                                image=i.imgSrc
+                                date=i.earthDate
+                                roverName=i.rover.name
+                                camera=i.camera.fullName
+                                status=i.rover.status
+                                landingDate=i.rover.landingDate
+                                launchDate=i.rover.launchDate
+                                showingPopover.toggle()
+                            }
+                    }
+                }
+                
+                if datas.offset == datas.pagiList.count {
+                    ProgressView()
+                        .padding(.vertical)
+                        .onAppear(perform: {
+                            datas.offset+=1
+                            datas.fetchData()
+                        })
+                } else {
+                    GeometryReader{reader -> Color in
+                        let minY=reader.frame(in: .global).minY
+                        let height = UIScreen.main.bounds.height / 1.3
+                        
+                        if !datas.pagiList.isEmpty && minY < height {
+                            DispatchQueue.main.async {
+                                datas.offset = datas.pagiList.count
+                            }
                         }
+                        return Color.clear
+                    }
+                    .frame(width: 20, height: 20)
                 }
             }
         }.onAppear{
-            datas.allPhotos()
+            if datas.pagiList.isEmpty{
+                datas.fetchData()
+            }
         }
         .popover(isPresented: $showingPopover) { () -> PhotoInfoView in
             PhotoInfoView(image: $image, date: $date, roverName: $roverName, camera: $camera, status: $status, landingDate: $landingDate, launchDate: $launchDate)
         }
     }
 }
+
 
 
 
