@@ -9,13 +9,12 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 import Combine
+import SwiftUI
 
 class DataViewModel : ObservableObject {
     
     @Published var photoList = [Photo]()
-    @Published var cameraList = [Camera]()
-    @Published var roverList = [Rover]()
-    @Published var collectionList = [String]()
+    @Published var allPhotoList = [Photo]()
     
     internal func getData(url: String) {
         
@@ -28,9 +27,6 @@ class DataViewModel : ObservableObject {
                     
                     for i in photos.photos {
                         self.photoList.append(i)
-                        self.cameraList.append(i.camera)
-                        self.roverList.append(i.rover)
-                        //self.collectionList.append(i.camera.fullName)
                     }
                 }
             } catch {
@@ -38,5 +34,35 @@ class DataViewModel : ObservableObject {
             }
         }
     }
+    
+    func allPhotos() {
+        
+        for name in rovers {
+            
+            AF.request("https://api.nasa.gov/mars-photos/api/v1/rovers/\(name)/photos?sol=1000&api_key=PypebXnYPJ43Gz1ecJwPztuxe8THTFWGMXnp4VnD&page=1").responseData { (responseData) in
+            
+            guard let data = responseData.data else { return }
+            do {
+                let photos = try JSONDecoder().decode(NasaAPI.self, from: data)
+                DispatchQueue.main.async {
+                    
+                    for i in photos.photos {
+                        self.allPhotoList.append(i)
+                    }
+                    let sortedPhotos = self.allPhotoList.sorted {
+                        $0.id < $1.id
+                    }
+                    self.allPhotoList=sortedPhotos
+                }
+            } catch {
+                print("hata2")
+            }
+        }
+            
+        }
+    }
 
 }
+
+private var rovers = ["curiosity","opportunity","spirit"]
+

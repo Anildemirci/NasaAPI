@@ -13,14 +13,6 @@ struct HomeView: View {
     
     @ObservedObject private var datas=DataViewModel()
     @State private var selected="grid"
-    @State private var showingPopover = false
-    @State private var image=""
-    @State private var date=""
-    @State private var roverName=""
-    @State private var camera=""
-    @State private var status=""
-    @State private var landingDate=""
-    @State private var launchDate=""
     
     var body: some View {
         NavigationView {
@@ -46,6 +38,7 @@ struct HomeView: View {
                         } else {
                             RowView()
                         }
+                        
                     }.frame(height: UIScreen.main.bounds.height * 0.7)
                     CustomTabBarView()
                 }
@@ -73,7 +66,6 @@ struct GridView: View {
     @State private var status=""
     @State private var landingDate=""
     @State private var launchDate=""
-    private let url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&api_key=PypebXnYPJ43Gz1ecJwPztuxe8THTFWGMXnp4VnD&page=1"
     
     let columns = [
         GridItem(.flexible()),
@@ -83,7 +75,7 @@ struct GridView: View {
     var body: some View {
         VStack {
             LazyVGrid(columns: columns) {
-                ForEach(datas.photoList){i in
+                ForEach(datas.allPhotoList){i in
                             VStack{
                                 AnimatedImage(url: URL(string: i.imgSrc))
                                     .resizable()
@@ -103,7 +95,7 @@ struct GridView: View {
                 }
             }
         }.onAppear{
-            datas.getData(url: url)
+            datas.allPhotos()
         }
         .popover(isPresented: $showingPopover) { () -> PhotoInfoView in
             PhotoInfoView(image: $image, date: $date, roverName: $roverName, camera: $camera, status: $status, landingDate: $landingDate, launchDate: $launchDate)
@@ -122,11 +114,10 @@ struct RowView: View {
     @State private var status=""
     @State private var landingDate=""
     @State private var launchDate=""
-    private let url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&api_key=PypebXnYPJ43Gz1ecJwPztuxe8THTFWGMXnp4VnD&page=1"
     
     var body: some View {
         VStack {
-            ForEach(datas.photoList){i in
+            ForEach(datas.allPhotoList){i in
                 VStack{
                     AnimatedImage(url: URL(string: i.imgSrc))
                         .resizable()
@@ -145,16 +136,13 @@ struct RowView: View {
                 }
             }
         }.onAppear{
-            datas.getData(url: url)
+            datas.allPhotos()
         }
         .popover(isPresented: $showingPopover) { () -> PhotoInfoView in
             PhotoInfoView(image: $image, date: $date, roverName: $roverName, camera: $camera, status: $status, landingDate: $landingDate, launchDate: $launchDate)
         }
     }
 }
-
-
-
 
 
 
